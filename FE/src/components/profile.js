@@ -3,39 +3,30 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 
+import axios from "axios"
+
+
 const Profile = () => {
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const { user, isAuthenticated, isLoading, getAccessTokenWithPopup, getAccessTokenSilently } = useAuth0();
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
+  const [data,Setdata]=useState(null)
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-      const token = await getAccessTokenSilently();
-      console.log(token)
-      const token1= await getAccessTokenSilently({audience:""})
-const decoded = jwtDecode(token);
+  useEffect(async () => {
+    const options = { authorizationParams: { audience: "http://story" } }; //modification here
+    const token = await getAccessTokenSilently(options);
+    setToken(token)
+   const data=await axios.get(`http://localhost:4000/data/${token}`)
+   Setdata(data);
+   console.log(data.data)
+   const adminstatus=await axios.get(`http://localhost:4000/admin/${token}`)
+   console.log("adminstatus",adminstatus.message)
 
-// Access roles from custom claim (replace with your namespace)
-const roles = decoded["dev-u1gdkhrrw304d3qq.us.auth0.com/roles"] || [];
-
-console.log("User roles:", roles);
-
-        console.log('Access Token:', token);
-        setToken(token);
-        const decodedToken = jwtDecode(token);
-        setDecoded(decodedToken);
-        console.log('Decoded:', decodedToken);
-      } catch (error) {
-        console.error('Error fetching token:', error);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchToken();
-    }
-  }, [getAccessTokenSilently, isAuthenticated]);
-
+  }, [getAccessTokenSilently]);
+  
+  
+// console.log(decoded)
+  
   if (isLoading) {
     return <div className="container mx-auto mt-8 text-center">Loading...</div>;
   }
@@ -54,29 +45,15 @@ console.log("User roles:", roles);
             alt="Profile"
             className="w-24 h-24 rounded-full mx-auto mb-4"
           />
-          <h2 className="text-xl font-semibold">{user.name}</h2>
+          <h2 className="text-xl font-semibold">{user.userid ? user.userid : user.name}</h2>
           <p className="text-gray-600">{user.email}</p>
-          <p> role: {user.role}</p>
 
-          <pre className="text-left mt-4 bg-gray-100 p-4 rounded">
-            {JSON.stringify(user, null, 2)}
-          </pre>
 
-          {token && (
-            <div className="mt-4 text-left">
-              <h3 className="font-semibold">Access Token:</h3>
-              <code className="text-xs break-all">{token}</code>
-            </div>
-          )}
+         
+         <p>User data:</p>
+         <pre>{JSON.stringify(decoded, null, 3)}</pre>
 
-          {decoded && (
-            <div className="mt-4 text-left">
-              <h3 className="font-semibold">Decoded Token:</h3>
-              <pre className="text-xs bg-gray-200 p-2 rounded">
-                {JSON.stringify(decoded, null, 2)}
-              </pre>
-            </div>
-          )}
+
         </div>
       )}
     </div>
