@@ -5,7 +5,7 @@ import express from "express"
 import axios from "axios"
 
 
-const domain="dev-u1gdkhrrw304d3qq.us.auth0.com"
+const domain = "dev-u1gdkhrrw304d3qq.us.auth0.com"
 const app = express()
 app.use(cors({
     origin: "http://localhost:3000",
@@ -20,32 +20,40 @@ app.get("/profile", (req, res) => {
     })
 })
 app.get("/data/:id", (req, res) => {
-    const id=req.params;
+    const id = req.params;
     // console.log(id)
-    const stringie=JSON.stringify(id)
-    const decoded=jwtDecode(stringie)
-return res.status(200).json(decoded)
+    const stringie = JSON.stringify(id)
+    const decoded = jwtDecode(stringie)
+    return res.status(200).json(decoded)
 
-   
+
 })
 
 
 
 app.get("/admin/:id", (req, res) => {
-     const id=req.params;
-    console.log(id)
-    const stringie=JSON.stringify(id)
-    const dedicate=jwtDecode(stringie)
-    console.log("decoded",dedicate)
-    // if (dedicate."dev-u1gdkhrrw304d3qq.us.auth0.com/roles".contains("admin")){
+    const authHeader = req.headers.authorization;
 
-    // return res.json({ message: "welcome admin" });}
-    // else{
-    //     return res.json({message:"welcome user"})
-    // }
-    return res.status(200).json({message:"hello"
-    })
-})
+
+    const token = authHeader.split(" ")[1];
+    try {
+        const decoded = jwtDecode(token);
+        console.log("decoded", decoded);
+
+        const roles = decoded["https://dev-u1gdkhrrw304d3qq.us.auth0.com/roles"] || [];
+
+        if (roles.includes('Report Auditor')) {
+            console.log("admin");
+            return res.json({ message: "welcome admin" });
+        } else {
+            console.log("noadmin");
+            return res.json({ message: "welcome user" });
+        }
+    } catch (error) {
+        console.error("Token decode error:", error);
+        return res.status(400).json({ message: "Invalid token" });
+    }
+});
 
 app.listen(4000, () => {
     console.log("listerning on 4000")

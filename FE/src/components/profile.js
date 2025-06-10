@@ -19,7 +19,12 @@ const Profile = () => {
    const data=await axios.get(`http://localhost:4000/data/${token}`)
    Setdata(data);
    console.log(data.data)
-   const adminstatus=await axios.get(`http://localhost:4000/admin/${token}`)
+    let config = {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  }
+   const adminstatus=await axios.get(`http://localhost:4000/admin/}`,config)
    console.log("adminstatus",adminstatus.message)
 
   }, [getAccessTokenSilently]);
