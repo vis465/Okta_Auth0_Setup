@@ -25,8 +25,8 @@ const Profile = () => {
     }
   }
    const adminstatus=await axios.get(`http://localhost:4000/admin/}`,config)
-   console.log("adminstatus",adminstatus.message)
-
+   console.log("adminstatus",adminstatus.data.message)
+  setDecoded(adminstatus.data.message)
   }, [getAccessTokenSilently]);
   
   
@@ -55,8 +55,8 @@ const Profile = () => {
 
 
          
-         <p>User data:</p>
-         <pre>{JSON.stringify(decoded, null, 3)}</pre>
+         <p>User role:</p>
+         <p>{decoded}</p>
 
 
         </div>

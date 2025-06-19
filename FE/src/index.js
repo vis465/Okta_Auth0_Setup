@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import { Auth0Provider } from '@auth0/auth0-react';
 
-// ✅ Access env variables with REACT_APP_ prefix
 const domain = "dev-u1gdkhrrw304d3qq.us.auth0.com";
 const clientId = "D9FbwDnaJFSKyrrEc1vdovSqMvSNVICD";
 
